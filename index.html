@@ -1,1 +1,1185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Melo's Living — Gestão Hoteleira</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1a2942;--navy2:#243352;--navy3:#2d3f63;
+  --blue:#3b82f6;--blue-h:#2563eb;
+  --green:#10b981;--green-l:#d1fae5;--green-d:#065f46;
+  --red:#ef4444;--red-l:#fee2e2;--red-d:#991b1b;
+  --orange:#f59e0b;--orange-l:#fef3c7;--orange-d:#92400e;
+  --purple:#8b5cf6;--purple-l:#ede9fe;
+  --g50:#f8fafc;--g100:#f1f5f9;--g200:#e2e8f0;--g300:#cbd5e1;
+  --g400:#94a3b8;--g500:#64748b;--g600:#475569;--g700:#334155;--g800:#1e293b;
+  --r:10px;--sw:260px;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+  --shm:0 4px 12px rgba(0,0,0,.1);
+  --shl:0 10px 30px rgba(0,0,0,.15);
+}
+body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--g800);height:100vh;display:flex;overflow:hidden;font-size:14px}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--g300);border-radius:10px}
 
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-box{background:white;border-radius:16px;padding:48px 40px;width:380px;box-shadow:var(--shl);text-align:center}
+.login-logo{font-size:42px;margin-bottom:8px}
+.login-title{font-size:22px;font-weight:800;color:var(--navy);margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--g500);margin-bottom:28px}
+.login-box .fg{margin-bottom:14px;text-align:left}
+.login-box input{width:100%;padding:11px 14px;border:1.5px solid var(--g200);border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color .15s,box-shadow .15s}
+.login-box input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+.login-box label{display:block;font-size:12.5px;font-weight:500;color:var(--g600);margin-bottom:5px}
+.login-btn{width:100%;padding:12px;background:var(--navy);color:white;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s;margin-top:8px}
+.login-btn:hover{background:var(--navy3)}
+.login-hint{font-size:11.5px;color:var(--g400);margin-top:14px}
+.login-err{background:var(--red-l);color:var(--red-d);border-radius:7px;padding:9px 12px;font-size:13px;margin-bottom:14px;display:none;align-items:center;gap:8px}
+
+/* SIDEBAR */
+#sidebar{width:var(--sw);background:var(--navy);color:white;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;transition:width .25s}
+.sb-header{padding:22px 20px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-logo{font-size:20px;font-weight:800;color:white;letter-spacing:-.3px}
+.sb-sub{font-size:11px;color:rgba(255,255,255,.4);margin-top:3px}
+.sb-nav{flex:1;padding:8px 0}
+.sb-section{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.28);padding:14px 20px 4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;font-size:13.5px;color:rgba(255,255,255,.68);transition:all .15s;border-left:3px solid transparent}
+.nav-item:hover{background:rgba(255,255,255,.07);color:white}
+.nav-item.active{background:rgba(255,255,255,.1);color:white;border-left-color:#63b3ed;font-weight:600}
+.nav-item i{width:18px;text-align:center;font-size:14px}
+.sb-footer{padding:14px 20px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between}
+.ver-badge{background:rgba(99,179,237,.15);color:#90cdf4;border-radius:4px;padding:2px 8px;font-size:11px}
+.sb-user-name{font-size:12px;color:rgba(255,255,255,.5)}
+
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#topbar{background:white;border-bottom:1px solid var(--g200);padding:0 28px;height:60px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tb-title{font-size:18px;font-weight:700;color:var(--g800)}
+.tb-right{display:flex;align-items:center;gap:16px}
+.tb-date{font-size:12px;color:var(--g500)}
+.avatar{width:34px;height:34px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700}
+.tb-user{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--g600)}
+.btn-logout{background:none;border:1px solid var(--g200);border-radius:7px;padding:6px 12px;font-size:12px;color:var(--g500);cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
+.btn-logout:hover{background:var(--red-l);color:var(--red-d);border-color:transparent}
+#content{flex:1;overflow-y:auto;padding:28px}
+
+/* PAGES */
+.page{display:none}.page.active{display:block}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.kpi-card{background:white;border-radius:var(--r);padding:20px;border:1px solid var(--g200);box-shadow:var(--sh);display:flex;align-items:center;gap:16px}
+.kpi-icon{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.kpi-icon.blue{background:#dbeafe;color:#2563eb}.kpi-icon.green{background:#d1fae5;color:#059669}
+.kpi-icon.orange{background:#ffedd5;color:#ea580c}.kpi-icon.purple{background:#ede9fe;color:#7c3aed}.kpi-icon.red{background:#fee2e2;color:#dc2626}
+.kpi-label{font-size:12px;color:var(--g500);margin-bottom:4px;font-weight:500}
+.kpi-value{font-size:24px;font-weight:800;color:var(--g800);line-height:1}
+.kpi-sub{font-size:11.5px;color:var(--g400);margin-top:4px}
+
+/* CARDS */
+.card{background:white;border-radius:var(--r);border:1px solid var(--g200);box-shadow:var(--sh)}
+.card-header{padding:16px 22px 13px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:14.5px;font-weight:600;color:var(--g800);display:flex;align-items:center;gap:8px}
+.card-title i{color:var(--g400)}
+.card-body{padding:20px 22px}
+.card-body.p0{padding:0}
+
+/* LAYOUTS */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
+.mb16{margin-bottom:16px}.mb24{margin-bottom:24px}.mt16{margin-top:16px}
+
+/* FORMS */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.form-full{grid-column:1/-1}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fl{font-size:12.5px;font-weight:500;color:var(--g600)}
+.fl .req{color:var(--red)}
+.fi,.fs,.fta{border:1.5px solid var(--g200);border-radius:8px;padding:8px 12px;font-size:13.5px;font-family:'Inter',sans-serif;color:var(--g800);background:white;outline:none;transition:border-color .15s,box-shadow .15s;width:100%}
+.fi:focus,.fs:focus,.fta:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.fi::placeholder{color:var(--g400)}
+.fi.ro{background:var(--g50);color:var(--g500);cursor:default}
+.fta{resize:vertical;min-height:64px}
+.irow{display:flex;gap:8px}.irow .fi{flex:1}
+.sep{height:1px;background:var(--g100);margin:18px 0}
+.sec-title{font-size:11.5px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-size:13.5px;font-weight:500;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--navy);color:white}.btn-primary:hover{background:var(--navy3)}
+.btn-blue{background:var(--blue);color:white}.btn-blue:hover{background:var(--blue-h)}
+.btn-success{background:var(--green);color:white}.btn-success:hover{background:#059669}
+.btn-danger{background:var(--red);color:white}.btn-danger:hover{background:#dc2626}
+.btn-warning{background:var(--orange);color:white}.btn-warning:hover{background:#d97706}
+.btn-ghost{background:white;color:var(--g600);border:1.5px solid var(--g200)}.btn-ghost:hover{background:var(--g50)}
+.btn-sm{padding:6px 12px;font-size:12.5px;border-radius:6px}
+.btn-xs{padding:4px 9px;font-size:11.5px;border-radius:5px}
+.btn-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;padding-top:16px;border-top:1px solid var(--g100)}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{background:var(--g50)}
+th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;border-bottom:1.5px solid var(--g200);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--g100);color:var(--g700);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--g50)}
+.empty-row td{text-align:center;color:var(--g400);padding:36px;font-size:13px}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600}
+.badge-green{background:#d1fae5;color:#065f46}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-orange{background:#fef3c7;color:#92400e}
+.badge-blue{background:#dbeafe;color:#1e40af}
+.badge-gray{background:var(--g100);color:var(--g600)}
+.badge-purple{background:#ede9fe;color:#5b21b6}
+
+/* FLASH */
+#flash{position:fixed;top:20px;right:20px;z-index:8888;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:360px}
+.flash-item{background:white;border-radius:9px;padding:12px 16px;box-shadow:var(--shm);border-left:4px solid var(--green);font-size:13.5px;display:flex;align-items:center;gap:10px;pointer-events:all;animation:slideIn .25s ease}
+.flash-item.err{border-left-color:var(--red)}.flash-item.warn{border-left-color:var(--orange)}.flash-item.info{border-left-color:var(--blue)}
+@keyframes slideIn{from{transform:translateX(30px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:7000;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:white;border-radius:14px;padding:28px;width:100%;max-width:500px;box-shadow:var(--shl);max-height:90vh;overflow-y:auto}
+.modal-lg{max-width:760px}
+.modal-title{font-size:17px;font-weight:700;color:var(--g800);margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--g500);margin-bottom:20px}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;padding-top:16px;border-top:1px solid var(--g100)}
+
+/* SEARCH */
+.search-bar{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.search-bar .fg{flex:1;min-width:140px}
+
+/* CALENDAR */
+.cal-nav{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.cal-title{font-size:18px;font-weight:700;color:var(--g800);flex:1}
+.cal-wrap{overflow-x:auto}
+.cal-table{width:100%;border-collapse:collapse;font-size:12px;min-width:900px}
+.cal-table th{background:var(--navy);color:white;padding:8px 5px;text-align:center;font-size:11px}
+.cal-table th:first-child{text-align:left;padding-left:16px;min-width:120px}
+.cal-table td{padding:5px;text-align:center;border:1px solid var(--g200);cursor:pointer}
+.cal-table td:first-child{text-align:left;padding-left:14px;font-weight:600;font-size:13px;color:var(--g700);background:var(--g50);border-right:2px solid var(--g300);cursor:default}
+.cal-vacant{background:white;color:var(--g300);font-size:10px}
+.cal-occ-a{background:#d1fae5;color:#065f46;font-weight:700;font-size:11px}
+.cal-occ-b{background:#fef9c3;color:#854d0e;font-weight:700;font-size:11px}
+.cal-occ-c{background:#dbeafe;color:#1e3a8a;font-weight:700;font-size:11px}
+.cal-today{outline:2px solid var(--blue);outline-offset:-2px}
+.cal-today-hdr{background:#1d4ed8!important}
+.cal-legend{display:flex;gap:20px;flex-wrap:wrap;margin-top:14px}
+.cal-legend-item{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--g600)}
+.cal-legend-dot{width:14px;height:14px;border-radius:4px}
+
+/* FIN */
+.fin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.fin-card{border-radius:var(--r);padding:18px;border:1px solid var(--g200)}
+.fin-card.ua{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-color:#86efac}
+.fin-card.ub{background:linear-gradient(135deg,#fefce8,#fef9c3);border-color:#fde047}
+.fin-card.uc{background:linear-gradient(135deg,#eff6ff,#dbeafe);border-color:#93c5fd}
+.fin-unit-name{font-size:14px;font-weight:700;color:var(--g800);margin-bottom:12px}
+.fin-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.fin-row .lbl{color:var(--g500)}
+.val-green{color:var(--green);font-weight:700}.val-red{color:var(--red);font-weight:700}.val-orange{color:var(--orange);font-weight:700}
+.fin-div{height:1px;background:rgba(0,0,0,.06);margin:8px 0}
+
+/* STAT PILLS */
+.stat-pills{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.stat-pill{background:white;border:1px solid var(--g200);border-radius:8px;padding:10px 16px;text-align:center;flex:1;min-width:90px}
+.stat-pill-val{font-size:20px;font-weight:800;color:var(--g800)}
+.stat-pill-lbl{font-size:11px;color:var(--g500);margin-top:2px}
+
+/* DETAIL VIEW */
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px}
+.di{padding:8px 0;border-bottom:1px solid var(--g100)}
+.di-label{font-size:11px;color:var(--g400);margin-bottom:2px;font-weight:500;text-transform:uppercase;letter-spacing:.3px}
+.di-value{font-size:13.5px;color:var(--g800);font-weight:500}
+
+/* CHECKOUT ALERTS */
+.co-list{display:flex;flex-direction:column;gap:8px}
+.co-item{display:flex;align-items:center;justify-content:space-between;padding:10px 13px;border-radius:8px;border-left:3px solid var(--orange)}
+.co-item.today{border-left-color:var(--red);background:var(--red-l)}
+.co-item.soon{border-left-color:var(--orange);background:var(--orange-l)}
+
+/* RESPONSIVE */
+@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.dash-grid{grid-template-columns:1fr}.fin-grid{grid-template-columns:1fr}}
+@media(max-width:768px){#sidebar{width:0;overflow:hidden}.form-grid,.form-grid3,.two-col,.three-col{grid-template-columns:1fr}.kpi-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div id="flash"></div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🏨</div>
+    <div class="login-title">Melo's Living</div>
+    <div class="login-sub">Sistema de Gestão Hoteleira</div>
+    <div class="login-err" id="login-err"><i class="fas fa-exclamation-circle"></i>&nbsp; Usuário ou senha inválidos.</div>
+    <div class="fg"><label>Usuário</label><input type="text" id="l-user" value="admin" autocomplete="username"></div>
+    <div class="fg" style="margin-top:12px"><label>Senha</label><input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="login-btn" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> &nbsp;Entrar</button>
+    <div class="login-hint">Padrão: admin / melos2025</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;flex:1;min-width:0">
+
+<nav id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">🏨 Melo's Living</div>
+    <div class="sb-sub">Gestão Hoteleira v5.0</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section">Principal</div>
+    <div class="nav-item active" data-page="dashboard" onclick="nav(this)"><i class="fas fa-chart-pie"></i> Dashboard</div>
+    <div class="sb-section">Hóspedes</div>
+    <div class="nav-item" data-page="cadastro" onclick="nav(this)"><i class="fas fa-user-plus"></i> Nova Reserva</div>
+    <div class="nav-item" data-page="consulta" onclick="nav(this)"><i class="fas fa-list-ul"></i> Todos os Hóspedes</div>
+    <div class="sb-section">Operação</div>
+    <div class="nav-item" data-page="calendario" onclick="nav(this)"><i class="fas fa-calendar-alt"></i> Calendário</div>
+    <div class="nav-item" data-page="financeiro" onclick="nav(this)"><i class="fas fa-chart-line"></i> Financeiro</div>
+    <div class="sb-section">Sistema</div>
+    <div class="nav-item" data-page="backup" onclick="nav(this)"><i class="fas fa-database"></i> Backup / Dados</div>
+    <div class="nav-item" data-page="config" onclick="nav(this)"><i class="fas fa-cog"></i> Configurações</div>
+  </div>
+  <div class="sb-footer">
+    <span class="ver-badge">v5.0</span>
+    <span class="sb-user-name" id="sb-user">Admin</span>
+  </div>
+</nav>
+
+<div id="main">
+  <header id="topbar">
+    <div class="tb-title" id="tb-title">Dashboard</div>
+    <div class="tb-right">
+      <div class="tb-date" id="tb-date"></div>
+      <div class="tb-user"><div class="avatar" id="tb-av">A</div><span id="tb-uname">Admin</span></div>
+      <button class="btn-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+    </div>
+  </header>
+
+  <div id="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="kpi-grid" id="kpi-grid"></div>
+      <div class="dash-grid">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-door-open"></i> Check-outs Próximos</div>
+          </div>
+          <div style="padding:16px" id="co-list-wrap"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-home"></i> Ocupação por Unidade</div></div>
+          <div class="card-body" style="position:relative;height:220px"><canvas id="chart-occ"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-history"></i> Últimas Reservas</div>
+            <button class="btn btn-ghost btn-sm" onclick="nav(document.querySelector('[data-page=consulta]'))">Ver todas <i class="fas fa-arrow-right"></i></button>
+          </div>
+          <div class="card-body p0">
+            <div class="tbl-wrap"><table>
+              <thead><tr><th>Hóspede</th><th>Unidade</th><th>Check-in</th><th>Check-out</th><th>Status</th></tr></thead>
+              <tbody id="recent-tbody"></tbody>
+            </table></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-coins"></i> Receita — Últimos 6 Meses</div></div>
+          <div class="card-body" style="position:relative;height:220px"><canvas id="chart-rev"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CADASTRO -->
+    <div class="page" id="page-cadastro">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-user-plus"></i> Nova Reserva</div>
+          <button class="btn btn-ghost btn-sm" onclick="limparCadastro()"><i class="fas fa-eraser"></i> Limpar</button>
+        </div>
+        <div class="card-body">
+          <div class="sec-title">Identificação do Hóspede</div>
+          <div class="form-grid mb16">
+            <div class="fg"><label class="fl">Nome Completo <span class="req">*</span></label><input class="fi" id="c-nome" type="text" placeholder="Nome completo do hóspede"></div>
+            <div class="fg"><label class="fl">CPF</label><input class="fi" id="c-cpf" type="text" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
+            <div class="fg"><label class="fl">Telefone</label><input class="fi" id="c-tel" type="text" placeholder="(00) 00000-0000" maxlength="15" oninput="maskPhone(this)"></div>
+            <div class="fg"><label class="fl">E-mail</label><input class="fi" id="c-email" type="email" placeholder="email@exemplo.com"></div>
+          </div>
+          <div class="sep"></div>
+          <div class="sec-title">Endereço</div>
+          <div class="form-grid mb16">
+            <div class="fg"><label class="fl">CEP</label>
+              <div class="irow"><input class="fi" id="c-cep" type="text" placeholder="00000-000" maxlength="9" oninput="maskCEP(this)"><button class="btn btn-ghost btn-sm" type="button" onclick="buscarCEP()"><i class="fas fa-search"></i> Buscar</button></div>
+            </div>
+            <div class="fg"><label class="fl">Logradouro</label><input class="fi" id="c-rua" type="text" placeholder="Rua, Avenida..."></div>
+            <div class="fg"><label class="fl">Número</label><input class="fi" id="c-num" type="text" placeholder="Nº"></div>
+            <div class="fg"><label class="fl">Complemento</label><input class="fi" id="c-comp" type="text" placeholder="Apto, Sala..."></div>
+            <div class="fg"><label class="fl">Cidade</label><input class="fi" id="c-cidade" type="text" placeholder="Cidade"></div>
+            <div class="fg"><label class="fl">Estado</label><input class="fi" id="c-estado" type="text" placeholder="UF" maxlength="2" style="text-transform:uppercase"></div>
+          </div>
+          <div class="sep"></div>
+          <div class="sec-title">Dados da Reserva</div>
+          <div class="form-grid mb16">
+            <div class="fg"><label class="fl">Unidade <span class="req">*</span></label><select class="fs" id="c-hosp"><option value="Beijupirá">Beijupirá</option><option value="Dubourcq">Dubourcq</option><option value="Portobelo">Portobelo</option></select></div>
+            <div class="fg"><label class="fl">Origem da Reserva</label><select class="fs" id="c-origem"><option>WhatsApp</option><option>Indicação</option><option>Site</option><option>Booking</option><option>Airbnb</option><option>Outros</option></select></div>
+            <div class="fg"><label class="fl">Código da Reserva</label><input class="fi" id="c-cod" type="text" placeholder="Ex: BKG-00123"></div>
+            <div class="fg"><label class="fl">Status da Hospedagem</label><select class="fs" id="c-status-hosp"><option value="Reserva">Reserva (ainda não chegou)</option><option value="Ativo">Ativo (check-in feito)</option><option value="Encerrado">Encerrado</option></select></div>
+            <div class="fg"><label class="fl">Check-in <span class="req">*</span></label><input class="fi" id="c-checkin" type="date" onchange="calcTotal()"></div>
+            <div class="fg"><label class="fl">Check-out <span class="req">*</span></label><input class="fi" id="c-checkout" type="date" onchange="calcTotal()"></div>
+          </div>
+          <div class="sep"></div>
+          <div class="sec-title">Financeiro</div>
+          <div class="form-grid3 mb16">
+            <div class="fg"><label class="fl">Valor da Diária (R$) <span class="req">*</span></label><input class="fi" id="c-diaria" type="number" min="0" step="0.01" placeholder="0,00" oninput="calcTotal()"></div>
+            <div class="fg"><label class="fl">Valor Já Pago (R$)</label><input class="fi" id="c-pago" type="number" min="0" step="0.01" placeholder="0,00" value="0" oninput="calcTotal()"></div>
+            <div class="fg"><label class="fl">Nº de Diárias</label><input class="fi ro" id="c-dias" readonly placeholder="—"></div>
+            <div class="fg"><label class="fl">Total da Estadia</label><input class="fi ro" id="c-total" readonly placeholder="—"></div>
+            <div class="fg"><label class="fl">Saldo Pendente</label><input class="fi ro" id="c-pendente" readonly placeholder="—"></div>
+            <div class="fg"><label class="fl">Status Financeiro</label><input class="fi ro" id="c-sfin" readonly placeholder="—"></div>
+          </div>
+          <div class="sep"></div>
+          <div class="sec-title">Observações</div>
+          <div class="fg mb16"><textarea class="fta" id="c-obs" placeholder="Pedidos especiais, anotações importantes..."></textarea></div>
+          <div class="btn-actions">
+            <button class="btn btn-primary" onclick="salvarHospede()"><i class="fas fa-save"></i> Salvar Reserva</button>
+            <button class="btn btn-ghost" onclick="limparCadastro()"><i class="fas fa-times"></i> Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONSULTA -->
+    <div class="page" id="page-consulta">
+      <div class="card mb24">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-filter"></i> Filtros</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-blue btn-sm" onclick="nav(document.querySelector('[data-page=cadastro]'))"><i class="fas fa-plus"></i> Nova Reserva</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportCSV()"><i class="fas fa-file-csv"></i> CSV</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportJSON()"><i class="fas fa-file-code"></i> JSON</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="search-bar">
+            <div class="fg"><label class="fl">Nome ou CPF</label><input class="fi" id="f-nome" type="text" placeholder="Buscar..." oninput="filtrar()"></div>
+            <div class="fg"><label class="fl">Unidade</label><select class="fs" id="f-hosp" onchange="filtrar()"><option value="">Todas</option><option>Beijupirá</option><option>Dubourcq</option><option>Portobelo</option></select></div>
+            <div class="fg"><label class="fl">Status Hosp.</label><select class="fs" id="f-status" onchange="filtrar()"><option value="">Todos</option><option>Ativo</option><option>Reserva</option><option>Encerrado</option></select></div>
+            <div class="fg"><label class="fl">Fin.</label><select class="fs" id="f-fin" onchange="filtrar()"><option value="">Todos</option><option>Pago</option><option>Parcial</option><option>Pendente</option></select></div>
+            <div class="fg"><label class="fl">Check-in De</label><input class="fi" id="f-de" type="date" onchange="filtrar()"></div>
+            <div class="fg"><label class="fl">Até</label><input class="fi" id="f-ate" type="date" onchange="filtrar()"></div>
+            <div class="fg" style="align-self:flex-end"><button class="btn btn-ghost btn-sm" onclick="limparFiltros()"><i class="fas fa-times"></i></button></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-users"></i> Hóspedes <span id="c-count" style="font-size:12px;font-weight:400;color:var(--g400);margin-left:6px"></span></div>
+        </div>
+        <div class="card-body p0">
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Hóspede</th><th>Unidade</th><th>Check-in</th><th>Check-out</th><th>Diárias</th><th>Total</th><th>Pago</th><th>Fin.</th><th>Hosp.</th><th>Ações</th></tr></thead>
+            <tbody id="tbody-h"></tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALENDÁRIO -->
+    <div class="page" id="page-calendario">
+      <div class="card">
+        <div class="card-header"><div class="card-title"><i class="fas fa-calendar-alt"></i> Calendário de Ocupação</div></div>
+        <div class="card-body">
+          <div class="cal-nav">
+            <button class="btn btn-ghost btn-sm" onclick="calMes(-1)"><i class="fas fa-chevron-left"></i></button>
+            <div class="cal-title" id="cal-title"></div>
+            <button class="btn btn-ghost btn-sm" onclick="calMes(1)"><i class="fas fa-chevron-right"></i></button>
+            <button class="btn btn-ghost btn-sm" onclick="calOffset=0;renderCalendario()">Hoje</button>
+          </div>
+          <div class="cal-wrap"><table class="cal-table" id="cal-table"></table></div>
+          <div class="cal-legend">
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#d1fae5;border:1px solid #86efac"></div>Beijupirá</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#fef9c3;border:1px solid #fde047"></div>Dubourcq</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#dbeafe;border:1px solid #93c5fd"></div>Portobelo</div>
+            <div class="cal-legend-item"><div class="cal-legend-dot" style="background:white;border:1px solid var(--g300)"></div>Disponível</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINANCEIRO -->
+    <div class="page" id="page-financeiro">
+      <div class="card mb24">
+        <div class="card-body">
+          <div class="search-bar">
+            <div class="fg"><label class="fl">Mês</label><select class="fs" id="fin-mes" onchange="renderFinanceiro()"><option value="">Todos</option></select></div>
+            <div class="fg"><label class="fl">Ano</label><select class="fs" id="fin-ano" onchange="renderFinanceiro()"></select></div>
+            <div class="fg"><label class="fl">Unidade</label><select class="fs" id="fin-unit" onchange="renderFinanceiro()"><option value="">Todas</option><option>Beijupirá</option><option>Dubourcq</option><option>Portobelo</option></select></div>
+            <div class="fg" style="align-self:flex-end"><button class="btn btn-ghost btn-sm" onclick="resetFiltroFin()"><i class="fas fa-times"></i></button></div>
+          </div>
+        </div>
+      </div>
+      <div class="fin-grid" id="fin-cards"></div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-chart-bar"></i> Receita por Unidade</div></div>
+          <div class="card-body" style="position:relative;height:220px"><canvas id="chart-fin-unit"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-exclamation-triangle"></i> Pendências Financeiras</div></div>
+          <div style="padding:12px 16px" id="pend-list"></div>
+        </div>
+      </div>
+      <div class="card mt16">
+        <div class="card-header"><div class="card-title"><i class="fas fa-table"></i> Extrato Detalhado</div></div>
+        <div class="card-body p0"><div class="tbl-wrap"><table>
+          <thead><tr><th>Hóspede</th><th>Unidade</th><th>Check-in</th><th>Check-out</th><th>Total</th><th>Pago</th><th>Pendente</th><th>Status</th></tr></thead>
+          <tbody id="tbody-ext"></tbody>
+        </table></div></div>
+      </div>
+    </div>
+
+    <!-- BACKUP -->
+    <div class="page" id="page-backup">
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-download"></i> Exportar Dados</div></div>
+          <div class="card-body">
+            <p style="font-size:13px;color:var(--g500);margin-bottom:18px">Faça download dos seus dados para backup ou migração.</p>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <button class="btn btn-primary" onclick="exportJSON()"><i class="fas fa-file-code"></i> Exportar como JSON</button>
+              <button class="btn btn-success" onclick="exportCSV()"><i class="fas fa-file-csv"></i> Exportar como CSV</button>
+            </div>
+            <div class="sep"></div>
+            <div id="bk-stats"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-upload"></i> Importar Dados</div></div>
+          <div class="card-body">
+            <p style="font-size:13px;color:var(--g500);margin-bottom:16px">Importe JSON (novo formato ou backup legado da versão Python).</p>
+            <div class="fg mb16"><label class="fl">Arquivo JSON</label><input type="file" id="import-file" accept=".json" class="fi" style="padding:6px"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn btn-warning btn-sm" onclick="doImport(false)"><i class="fas fa-file-import"></i> Mesclar</button>
+              <button class="btn btn-danger btn-sm" onclick="doImport(true)"><i class="fas fa-exchange-alt"></i> Substituir Tudo</button>
+            </div>
+            <div class="sep"></div>
+            <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="confirmarLimpar()"><i class="fas fa-trash-alt"></i> Apagar Todos os Dados</button>
+          </div>
+        </div>
+      </div>
+      <div class="card mt16">
+        <div class="card-header"><div class="card-title"><i class="fas fa-info-circle"></i> Resumo do Banco de Dados</div></div>
+        <div class="card-body"><div id="db-summary"></div></div>
+      </div>
+    </div>
+
+    <!-- CONFIGURAÇÕES -->
+    <div class="page" id="page-config">
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-hotel"></i> Unidades / Propriedades</div></div>
+          <div class="card-body">
+            <p style="font-size:12.5px;color:var(--g500);margin-bottom:14px">Unidades cadastradas no sistema:</p>
+            <div id="units-list"></div>
+            <div class="sep"></div>
+            <div class="fg mb16"><label class="fl">Nome da Nova Unidade</label><input class="fi" id="new-unit" type="text" placeholder="Ex: Jardins"></div>
+            <button class="btn btn-primary btn-sm" onclick="addUnit()"><i class="fas fa-plus"></i> Adicionar</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title"><i class="fas fa-lock"></i> Alterar Credenciais</div></div>
+          <div class="card-body">
+            <div class="fg mb16"><label class="fl">Usuário</label><input class="fi" id="cfg-user" type="text" placeholder="admin"></div>
+            <div class="fg mb16"><label class="fl">Nova Senha</label><input class="fi" id="cfg-pass" type="password" placeholder="••••••••"></div>
+            <div class="fg mb16"><label class="fl">Confirmar Senha</label><input class="fi" id="cfg-pass2" type="password" placeholder="••••••••"></div>
+            <button class="btn btn-primary" onclick="salvarCreds()"><i class="fas fa-save"></i> Salvar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- MODAL: VER -->
+<div class="modal-bg" id="modal-ver">
+  <div class="modal modal-lg">
+    <div class="modal-title" id="mv-nome"></div>
+    <div class="modal-sub" id="mv-sub"></div>
+    <div class="detail-grid" id="mv-grid"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-ver')">Fechar</button>
+      <button class="btn btn-warning" onclick="editarDoModal()"><i class="fas fa-edit"></i> Editar</button>
+      <button class="btn btn-success" id="mv-co-btn"><i class="fas fa-sign-out-alt"></i> Check-out</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EDITAR -->
+<div class="modal-bg" id="modal-edit">
+  <div class="modal modal-lg">
+    <div class="modal-title">Editar Reserva</div>
+    <div class="modal-sub" id="me-sub"></div>
+    <input type="hidden" id="me-id">
+    <div class="form-grid mb16">
+      <div class="fg"><label class="fl">Nome <span class="req">*</span></label><input class="fi" id="me-nome" type="text"></div>
+      <div class="fg"><label class="fl">CPF</label><input class="fi" id="me-cpf" type="text" maxlength="14" oninput="maskCPF(this)"></div>
+      <div class="fg"><label class="fl">Telefone</label><input class="fi" id="me-tel" type="text" maxlength="15" oninput="maskPhone(this)"></div>
+      <div class="fg"><label class="fl">E-mail</label><input class="fi" id="me-email" type="email"></div>
+    </div>
+    <div class="sep"></div>
+    <div class="form-grid mb16">
+      <div class="fg"><label class="fl">Unidade</label><select class="fs" id="me-hosp"></select></div>
+      <div class="fg"><label class="fl">Origem</label><select class="fs" id="me-origem"><option>WhatsApp</option><option>Indicação</option><option>Site</option><option>Booking</option><option>Airbnb</option><option>Outros</option></select></div>
+      <div class="fg"><label class="fl">Código Reserva</label><input class="fi" id="me-cod" type="text"></div>
+      <div class="fg"><label class="fl">Status Hospedagem</label><select class="fs" id="me-sh"><option value="Reserva">Reserva</option><option value="Ativo">Ativo</option><option value="Encerrado">Encerrado</option></select></div>
+      <div class="fg"><label class="fl">Check-in</label><input class="fi" id="me-ci" type="date" onchange="calcEditTotal()"></div>
+      <div class="fg"><label class="fl">Check-out</label><input class="fi" id="me-co" type="date" onchange="calcEditTotal()"></div>
+    </div>
+    <div class="sep"></div>
+    <div class="form-grid3 mb16">
+      <div class="fg"><label class="fl">Diária (R$)</label><input class="fi" id="me-diaria" type="number" min="0" step="0.01" oninput="calcEditTotal()"></div>
+      <div class="fg"><label class="fl">Pago (R$)</label><input class="fi" id="me-pago" type="number" min="0" step="0.01" oninput="calcEditTotal()"></div>
+      <div class="fg"><label class="fl">Total</label><input class="fi ro" id="me-total" readonly></div>
+    </div>
+    <div class="fg mb16"><label class="fl">Observações</label><textarea class="fta" id="me-obs"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEdicao()"><i class="fas fa-save"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CONFIRM -->
+<div class="modal-bg" id="modal-confirm">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title" id="mc-title"></div>
+    <div style="font-size:13.5px;color:var(--g600);margin:12px 0 20px" id="mc-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-confirm')">Cancelar</button>
+      <button class="btn btn-danger" id="mc-ok">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STORAGE ──
+const SK='melos_v5_hospedes', CK='melos_v5_creds', UK='melos_v5_units';
+const getH=()=>{try{return JSON.parse(localStorage.getItem(SK)||'[]')}catch{return[]}};
+const setH=d=>localStorage.setItem(SK,JSON.stringify(d));
+const getCreds=()=>{try{return JSON.parse(localStorage.getItem(CK)||'{"u":"admin","p":"melos2025"}')}catch{return{u:'admin',p:'melos2025'}}};
+const getUnits=()=>{try{return JSON.parse(localStorage.getItem(UK)||'["Beijupirá","Dubourcq","Portobelo"]')}catch{return['Beijupirá','Dubourcq','Portobelo']}};
+const setUnits=u=>localStorage.setItem(UK,JSON.stringify(u));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+let curViewId='', calOffset=0, chartOcc=null, chartRev=null, chartFU=null;
+
+// ── AUTH ──
+function doLogin(){
+  const u=document.getElementById('l-user').value.trim();
+  const p=document.getElementById('l-pass').value;
+  const c=getCreds();
+  if(u===c.u&&p===c.p){
+    document.getElementById('login-screen').style.display='none';
+    const app=document.getElementById('app');
+    app.style.display='flex'; app.style.width='100%'; app.style.height='100vh'; app.style.overflow='hidden';
+    document.getElementById('tb-uname').textContent=cap(u);
+    document.getElementById('sb-user').textContent=cap(u);
+    document.getElementById('tb-av').textContent=u[0].toUpperCase();
+    setInterval(updateDate,60000); updateDate();
+    populateSelectUnits(); populateFinFilters();
+    renderDashboard();
+  }else{
+    const e=document.getElementById('login-err'); e.style.display='flex';
+    document.getElementById('l-pass').value='';
+  }
+}
+function doLogout(){
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-err').style.display='none';
+  document.getElementById('l-pass').value='';
+}
+function cap(s){return s?s[0].toUpperCase()+s.slice(1):''}
+
+// ── DATE ──
+function updateDate(){
+  document.getElementById('tb-date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+// ── NAVIGATION ──
+const PAGE_TITLES={dashboard:'Dashboard',cadastro:'Nova Reserva',consulta:'Todos os Hóspedes',calendario:'Calendário de Ocupação',financeiro:'Financeiro',backup:'Backup / Dados',config:'Configurações'};
+function nav(el){
+  if(typeof el==='string') el=document.querySelector(`[data-page="${el}"]`);
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  const p=el.dataset.page;
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('tb-title').textContent=PAGE_TITLES[p]||p;
+  if(p==='dashboard') renderDashboard();
+  if(p==='consulta') filtrar();
+  if(p==='calendario') renderCalendario();
+  if(p==='financeiro') renderFinanceiro();
+  if(p==='backup') renderBackup();
+  if(p==='config') renderConfig();
+}
+
+// ── FLASH ──
+function flash(msg,type='ok'){
+  const icons={ok:'check-circle',err:'times-circle',warn:'exclamation-triangle',info:'info-circle'};
+  const cls={ok:'',err:' err',warn:' warn',info:' info'};
+  const el=document.createElement('div');
+  el.className='flash-item'+cls[type];
+  el.innerHTML=`<i class="fas fa-${icons[type]}"></i> ${msg}`;
+  document.getElementById('flash').appendChild(el);
+  setTimeout(()=>el.remove(),4000);
+}
+
+// ── MODAL ──
+function openModal(id){document.getElementById(id).classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+function confirm2(title,body,fn,label='Confirmar'){
+  document.getElementById('mc-title').textContent=title;
+  document.getElementById('mc-body').textContent=body;
+  const btn=document.getElementById('mc-ok');
+  btn.textContent=label;
+  btn.onclick=()=>{closeModal('modal-confirm');fn()};
+  openModal('modal-confirm');
+}
+
+// ── MASKS ──
+function maskCPF(el){
+  let v=el.value.replace(/\D/g,'').slice(0,11);
+  if(v.length>9) v=v.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/,'$1.$2.$3-$4');
+  else if(v.length>6) v=v.replace(/(\d{3})(\d{3})(\d{0,3})/,'$1.$2.$3');
+  else if(v.length>3) v=v.replace(/(\d{3})(\d{0,3})/,'$1.$2');
+  el.value=v;
+}
+function maskPhone(el){
+  let v=el.value.replace(/\D/g,'').slice(0,11);
+  if(v.length===11) v=v.replace(/(\d{2})(\d{5})(\d{4})/,'($1) $2-$3');
+  else if(v.length===10) v=v.replace(/(\d{2})(\d{4})(\d{4})/,'($1) $2-$3');
+  else if(v.length>6) v=v.replace(/(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3');
+  else if(v.length>2) v=v.replace(/(\d{2})(\d{0,5})/,'($1) $2');
+  el.value=v;
+}
+function maskCEP(el){
+  let v=el.value.replace(/\D/g,'').slice(0,8);
+  if(v.length>5) v=v.replace(/(\d{5})(\d{1,3})/,'$1-$2');
+  el.value=v;
+}
+
+// ── CEP ──
+async function buscarCEP(){
+  const cep=document.getElementById('c-cep').value.replace(/\D/g,'');
+  if(cep.length!==8){if(cep.length>0)flash('CEP inválido.','warn');return;}
+  try{
+    const r=await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const d=await r.json();
+    if(d.erro){flash('CEP não encontrado.','warn');return;}
+    if(d.logradouro) document.getElementById('c-rua').value=d.logradouro;
+    if(d.localidade) document.getElementById('c-cidade').value=d.localidade;
+    if(d.uf) document.getElementById('c-estado').value=d.uf;
+    flash('Endereço preenchido!','info');
+  }catch{flash('Erro ao buscar CEP.','err');}
+}
+
+// ── CALC ──
+function calcDiasN(ci,co){if(!ci||!co)return 0;return Math.max(1,Math.round((new Date(co)-new Date(ci))/86400000));}
+function calcTotal(){
+  const ci=document.getElementById('c-checkin').value;
+  const co=document.getElementById('c-checkout').value;
+  const d=parseFloat(document.getElementById('c-diaria').value)||0;
+  const p=parseFloat(document.getElementById('c-pago').value)||0;
+  if(ci&&co&&d>0){
+    const dias=calcDiasN(ci,co);
+    const tot=dias*d; const pend=Math.max(0,tot-p);
+    document.getElementById('c-dias').value=dias;
+    document.getElementById('c-total').value='R$ '+fmtMoney(tot);
+    document.getElementById('c-pendente').value='R$ '+fmtMoney(pend);
+    document.getElementById('c-sfin').value=pend<=0?'Pago':(p===0?'Pendente':'Parcial');
+  }
+}
+function calcEditTotal(){
+  const ci=document.getElementById('me-ci').value;
+  const co=document.getElementById('me-co').value;
+  const d=parseFloat(document.getElementById('me-diaria').value)||0;
+  if(ci&&co&&d>0) document.getElementById('me-total').value='R$ '+fmtMoney(calcDiasN(ci,co)*d);
+}
+
+// ── CONFLICT ──
+function checkConflito(hosp,ci,co,excludeId=''){
+  return getH().filter(h=>{
+    if(h.id===excludeId||h.hospedagem!==hosp||h.statusHospedagem==='Encerrado') return false;
+    return ci<h.checkout&&co>h.checkin;
+  });
+}
+
+// ── SALVAR ──
+function salvarHospede(){
+  const nome=document.getElementById('c-nome').value.trim();
+  const ci=document.getElementById('c-checkin').value;
+  const co=document.getElementById('c-checkout').value;
+  const hosp=document.getElementById('c-hosp').value;
+  const diaria=parseFloat(document.getElementById('c-diaria').value)||0;
+  if(!nome){flash('Nome obrigatório.','err');return;}
+  if(!ci||!co){flash('Informe as datas de check-in e check-out.','err');return;}
+  if(new Date(co)<=new Date(ci)){flash('Check-out deve ser após o check-in.','err');return;}
+  if(diaria<=0){flash('Informe o valor da diária.','err');return;}
+  const conf=checkConflito(hosp,ci,co);
+  if(conf.length){flash(`⚠️ Conflito: ${hosp} já reservada por ${conf[0].nome} neste período.`,'err');return;}
+  const pago=parseFloat(document.getElementById('c-pago').value)||0;
+  const dias=calcDiasN(ci,co);
+  const total=dias*diaria;
+  const pend=Math.max(0,total-pago);
+  const sf=pend<=0?'Pago':(pago===0?'Pendente':'Parcial');
+  const h={
+    id:uid(), nome, cpf:document.getElementById('c-cpf').value.trim(),
+    telefone:document.getElementById('c-tel').value.trim(), email:document.getElementById('c-email').value.trim(),
+    cep:document.getElementById('c-cep').value.trim(), logradouro:document.getElementById('c-rua').value.trim(),
+    numero:document.getElementById('c-num').value.trim(), complemento:document.getElementById('c-comp').value.trim(),
+    cidade:document.getElementById('c-cidade').value.trim(), estado:document.getElementById('c-estado').value.trim().toUpperCase(),
+    hospedagem:hosp, origem:document.getElementById('c-origem').value,
+    codigoReserva:document.getElementById('c-cod').value.trim(),
+    statusHospedagem:document.getElementById('c-status-hosp').value,
+    checkin:ci, checkout:co, diaria, pago, total, pendente:pend, statusFinanceiro:sf,
+    observacoes:document.getElementById('c-obs').value.trim(), registro:new Date().toISOString()
+  };
+  const arr=getH(); arr.push(h); setH(arr);
+  flash(`✅ Reserva de ${nome} salva com sucesso!`);
+  limparCadastro();
+  nav(document.querySelector('[data-page=consulta]'));
+}
+function limparCadastro(){
+  ['c-nome','c-cpf','c-tel','c-email','c-cep','c-rua','c-num','c-comp','c-cidade','c-estado',
+   'c-cod','c-checkin','c-checkout','c-diaria','c-pago','c-dias','c-total','c-pendente','c-sfin','c-obs']
+  .forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('c-hosp').selectedIndex=0;
+  document.getElementById('c-origem').selectedIndex=0;
+  document.getElementById('c-status-hosp').selectedIndex=0;
+  const today=new Date().toISOString().split('T')[0];
+  const tomorrow=new Date(Date.now()+86400000).toISOString().split('T')[0];
+  document.getElementById('c-checkin').value=today;
+  document.getElementById('c-checkout').value=tomorrow;
+}
+
+// ── CONSULTA ──
+function filtrar(){
+  const nome=(document.getElementById('f-nome').value||'').toLowerCase();
+  const hosp=document.getElementById('f-hosp').value;
+  const status=document.getElementById('f-status').value;
+  const fin=document.getElementById('f-fin').value;
+  const de=document.getElementById('f-de').value;
+  const ate=document.getElementById('f-ate').value;
+  let arr=getH();
+  if(nome) arr=arr.filter(h=>h.nome.toLowerCase().includes(nome)||(h.cpf||'').includes(nome));
+  if(hosp) arr=arr.filter(h=>h.hospedagem===hosp);
+  if(status) arr=arr.filter(h=>h.statusHospedagem===status);
+  if(fin) arr=arr.filter(h=>h.statusFinanceiro===fin);
+  if(de) arr=arr.filter(h=>h.checkin>=de);
+  if(ate) arr=arr.filter(h=>h.checkin<=ate);
+  arr.sort((a,b)=>new Date(b.registro||b.checkin)-new Date(a.registro||a.checkin));
+  document.getElementById('c-count').textContent=`(${arr.length} registro${arr.length!==1?'s':''})`;
+  const tbody=document.getElementById('tbody-h');
+  if(!arr.length){tbody.innerHTML='<tr class="empty-row"><td colspan="10"><i class="fas fa-search" style="font-size:22px;display:block;margin-bottom:8px;color:var(--g300)"></i>Nenhum hóspede encontrado.</td></tr>';return;}
+  tbody.innerHTML=arr.map(h=>`<tr>
+    <td><strong>${h.nome}</strong><br><span style="font-size:11.5px;color:var(--g400)">${h.cpf||'—'}</span></td>
+    <td>${unitBadge(h.hospedagem)}</td>
+    <td>${fd(h.checkin)}</td><td>${fd(h.checkout)}</td>
+    <td style="text-align:center">${calcDiasN(h.checkin,h.checkout)}</td>
+    <td>R$ ${fmtMoney(h.total||0)}</td>
+    <td>R$ ${fmtMoney(h.pago||0)}</td>
+    <td>${finBadge(h.statusFinanceiro)}</td>
+    <td>${hospBadge(h.statusHospedagem)}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn btn-ghost btn-xs" title="Detalhes" onclick="verH('${h.id}')"><i class="fas fa-eye"></i></button>
+      <button class="btn btn-ghost btn-xs" title="Editar" onclick="abrirEdicao('${h.id}')"><i class="fas fa-edit"></i></button>
+      <button class="btn btn-danger btn-xs" title="Excluir" onclick="excluir('${h.id}','${esc(h.nome)}')"><i class="fas fa-trash"></i></button>
+    </div></td>
+  </tr>`).join('');
+}
+function limparFiltros(){
+  ['f-nome','f-de','f-ate'].forEach(id=>document.getElementById(id).value='');
+  ['f-hosp','f-status','f-fin'].forEach(id=>document.getElementById(id).selectedIndex=0);
+  filtrar();
+}
+
+// ── VER ──
+function verH(id){
+  const h=getH().find(x=>x.id===id); if(!h) return;
+  curViewId=id;
+  document.getElementById('mv-nome').textContent=h.nome;
+  document.getElementById('mv-sub').textContent=`${h.hospedagem} · Check-in: ${fd(h.checkin)} → Check-out: ${fd(h.checkout)}`;
+  const dias=calcDiasN(h.checkin,h.checkout);
+  const items=[
+    ['CPF',h.cpf||'—'],['Telefone',h.telefone||'—'],['E-mail',h.email||'—'],['Origem',h.origem||'—'],
+    ['Código Reserva',h.codigoReserva||'—'],['Status Hospedagem',h.statusHospedagem],
+    ['Check-in',fd(h.checkin)],['Check-out',fd(h.checkout)],['Nº Diárias',dias],
+    ['Valor Diária','R$ '+fmtMoney(h.diaria||0)],['Total','R$ '+fmtMoney(h.total||0)],
+    ['Pago','R$ '+fmtMoney(h.pago||0)],['Pendente','R$ '+fmtMoney(h.pendente||0)],
+    ['Status Financeiro',h.statusFinanceiro],
+    ['Endereço',`${h.logradouro||'—'}${h.numero?', '+h.numero:''}${h.complemento?', '+h.complemento:''}`],
+    ['Cidade/UF',`${h.cidade||'—'}${h.estado?' / '+h.estado:''}`],
+    ...(h.observacoes?[['Observações',h.observacoes]]:[]),
+    ['Registro',h.registro?new Date(h.registro).toLocaleString('pt-BR'):'—']
+  ];
+  document.getElementById('mv-grid').innerHTML=items.map(([l,v])=>`<div class="di"><div class="di-label">${l}</div><div class="di-value">${v}</div></div>`).join('');
+  const coBtn=document.getElementById('mv-co-btn');
+  coBtn.style.display=h.statusHospedagem==='Ativo'?'inline-flex':'none';
+  coBtn.onclick=()=>{closeModal('modal-ver');checkout(h.id);};
+  openModal('modal-ver');
+}
+function editarDoModal(){closeModal('modal-ver');abrirEdicao(curViewId);}
+
+// ── EDITAR ──
+function abrirEdicao(id){
+  const h=getH().find(x=>x.id===id); if(!h) return;
+  document.getElementById('me-id').value=h.id;
+  document.getElementById('me-sub').textContent=`Editando: ${h.nome}`;
+  document.getElementById('me-nome').value=h.nome||'';
+  document.getElementById('me-cpf').value=h.cpf||'';
+  document.getElementById('me-tel').value=h.telefone||'';
+  document.getElementById('me-email').value=h.email||'';
+  populateUnitSelect('me-hosp', h.hospedagem);
+  document.getElementById('me-origem').value=h.origem||'Outros';
+  document.getElementById('me-cod').value=h.codigoReserva||'';
+  document.getElementById('me-sh').value=h.statusHospedagem||'Ativo';
+  document.getElementById('me-ci').value=h.checkin||'';
+  document.getElementById('me-co').value=h.checkout||'';
+  document.getElementById('me-diaria').value=h.diaria||'';
+  document.getElementById('me-pago').value=h.pago||'';
+  document.getElementById('me-total').value=h.total?'R$ '+fmtMoney(h.total):'';
+  document.getElementById('me-obs').value=h.observacoes||'';
+  openModal('modal-edit');
+}
+function salvarEdicao(){
+  const id=document.getElementById('me-id').value;
+  const arr=getH(); const idx=arr.findIndex(x=>x.id===id); if(idx<0) return;
+  const nome=document.getElementById('me-nome').value.trim();
+  if(!nome){flash('Nome obrigatório.','err');return;}
+  const ci=document.getElementById('me-ci').value;
+  const co=document.getElementById('me-co').value;
+  const hosp=document.getElementById('me-hosp').value;
+  if(ci&&co&&new Date(co)<=new Date(ci)){flash('Check-out deve ser após check-in.','err');return;}
+  const conf=checkConflito(hosp,ci,co,id);
+  if(conf.length){flash(`Conflito com ${conf[0].nome}!`,'err');return;}
+  const diaria=parseFloat(document.getElementById('me-diaria').value)||0;
+  const pago=parseFloat(document.getElementById('me-pago').value)||0;
+  const dias=calcDiasN(ci,co);
+  const total=dias*diaria; const pend=Math.max(0,total-pago);
+  const sf=pend<=0?'Pago':(pago===0?'Pendente':'Parcial');
+  arr[idx]={...arr[idx],nome,cpf:document.getElementById('me-cpf').value.trim(),
+    telefone:document.getElementById('me-tel').value.trim(),email:document.getElementById('me-email').value.trim(),
+    hospedagem:hosp,origem:document.getElementById('me-origem').value,
+    codigoReserva:document.getElementById('me-cod').value.trim(),
+    statusHospedagem:document.getElementById('me-sh').value,
+    checkin:ci,checkout:co,diaria,pago,total,pendente:pend,statusFinanceiro:sf,
+    observacoes:document.getElementById('me-obs').value.trim()};
+  setH(arr); closeModal('modal-edit'); flash('Reserva atualizada!'); filtrar();
+}
+
+// ── EXCLUIR ──
+function excluir(id,nome){
+  confirm2('Excluir Hóspede',`Excluir "${nome}" permanentemente?`,()=>{
+    setH(getH().filter(x=>x.id!==id)); flash('Hóspede excluído.','warn'); filtrar();
+  },'Excluir');
+}
+
+// ── CHECK-OUT ──
+function checkout(id){
+  const arr=getH(); const idx=arr.findIndex(x=>x.id===id); if(idx<0) return;
+  arr[idx].statusHospedagem='Encerrado';
+  setH(arr); flash(`Check-out de ${arr[idx].nome} realizado!`); filtrar();
+}
+
+// ── DASHBOARD ──
+function renderDashboard(){
+  const arr=getH();
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  const ativos=arr.filter(h=>h.statusHospedagem==='Ativo');
+  const reservas=arr.filter(h=>h.statusHospedagem==='Reserva');
+  const m=hoje.getMonth(), y=hoje.getFullYear();
+  const doMes=arr.filter(h=>{const d=new Date(h.checkin);return d.getMonth()===m&&d.getFullYear()===y;});
+  const recMes=doMes.reduce((s,h)=>s+(h.total||0),0);
+  const pend=arr.filter(h=>h.statusFinanceiro!=='Pago'&&h.statusHospedagem!=='Encerrado').length;
+  document.getElementById('kpi-grid').innerHTML=[
+    {icon:'fa-bed',cls:'blue',label:'Hóspedes Ativos',value:ativos.length,sub:`${reservas.length} reserva(s) aguardando`},
+    {icon:'fa-calendar-check',cls:'green',label:'Reservas do Mês',value:doMes.length,sub:'Check-ins no mês atual'},
+    {icon:'fa-coins',cls:'orange',label:'Receita do Mês',value:'R$ '+fmtMoney(recMes),sub:'Total bruto'},
+    {icon:'fa-exclamation-circle',cls:pend>0?'red':'green',label:'Pendências Fin.',value:pend,sub:'Pagamentos em aberto'},
+  ].map(k=>`<div class="kpi-card"><div class="kpi-icon ${k.cls}"><i class="fas ${k.icon}"></i></div><div><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.value}</div><div class="kpi-sub">${k.sub}</div></div></div>`).join('');
+  // Check-outs próximos
+  const d2=new Date(hoje); d2.setDate(d2.getDate()+2);
+  const proxCO=arr.filter(h=>{
+    if(h.statusHospedagem==='Encerrado') return false;
+    const co=new Date(h.checkout); co.setHours(0,0,0,0); return co>=hoje&&co<=d2;
+  }).sort((a,b)=>new Date(a.checkout)-new Date(b.checkout));
+  const coWrap=document.getElementById('co-list-wrap');
+  coWrap.innerHTML=proxCO.length?'<div class="co-list">'+proxCO.map(h=>{
+    const co=new Date(h.checkout); co.setHours(0,0,0,0);
+    const isH=co.getTime()===hoje.getTime();
+    return `<div class="co-item ${isH?'today':'soon'}"><div><strong>${h.nome}</strong><br><span style="font-size:12px">${h.hospedagem} · ${fd(h.checkout)}</span></div>${isH?'<span class="badge badge-red">Hoje</span>':'<span class="badge badge-orange">Amanhã</span>'}</div>`;
+  }).join('')+'</div>':'<p style="color:var(--g400);font-size:13px;text-align:center;padding:16px">Nenhum check-out nos próximos 2 dias.</p>';
+  // Recent
+  const rec=arr.slice().sort((a,b)=>new Date(b.registro||b.checkin)-new Date(a.registro||a.checkin)).slice(0,8);
+  document.getElementById('recent-tbody').innerHTML=rec.length?rec.map(h=>`<tr><td><strong>${h.nome}</strong></td><td>${unitBadge(h.hospedagem)}</td><td>${fd(h.checkin)}</td><td>${fd(h.checkout)}</td><td>${hospBadge(h.statusHospedagem)}</td></tr>`).join(''):'<tr class="empty-row"><td colspan="5">Nenhuma reserva ainda.</td></tr>';
+  // Charts
+  const units=getUnits();
+  const colors=['rgba(16,185,129,.7)','rgba(245,158,11,.7)','rgba(59,130,246,.7)','rgba(139,92,246,.7)'];
+  const atUnit=arr.filter(h=>h.statusHospedagem!=='Encerrado');
+  const uCounts=units.map(u=>atUnit.filter(h=>h.hospedagem===u).length);
+  const ctx1=document.getElementById('chart-occ').getContext('2d');
+  if(chartOcc) chartOcc.destroy();
+  chartOcc=new Chart(ctx1,{type:'doughnut',data:{labels:units,datasets:[{data:uCounts,backgroundColor:colors.slice(0,units.length),borderWidth:2,borderColor:'white'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:12},padding:14}}}}});
+  const months=[],labels=[];
+  for(let i=5;i>=0;i--){const d=new Date();d.setMonth(d.getMonth()-i);months.push({m:d.getMonth(),y:d.getFullYear()});labels.push(d.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}));}
+  const revData=months.map(({m,y})=>arr.filter(h=>{const d=new Date(h.checkin);return d.getMonth()===m&&d.getFullYear()===y;}).reduce((s,h)=>s+(h.total||0),0));
+  const ctx2=document.getElementById('chart-rev').getContext('2d');
+  if(chartRev) chartRev.destroy();
+  chartRev=new Chart(ctx2,{type:'bar',data:{labels,datasets:[{label:'Receita',data:revData,backgroundColor:'rgba(59,130,246,.6)',borderColor:'rgba(59,130,246,1)',borderWidth:1,borderRadius:6}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'R$ '+v.toLocaleString('pt-BR')},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}});
+}
+
+// ── CALENDÁRIO ──
+function renderCalendario(){
+  const hoje=new Date();
+  const d=new Date(hoje.getFullYear(),hoje.getMonth()+calOffset,1);
+  const ano=d.getFullYear(), mes=d.getMonth();
+  document.getElementById('cal-title').textContent=d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
+  const diasNoMes=new Date(ano,mes+1,0).getDate();
+  const arr=getH(); const units=getUnits();
+  const hdrs=['<th>Unidade</th>'];
+  for(let i=1;i<=diasNoMes;i++){
+    const isH=i===hoje.getDate()&&mes===hoje.getMonth()&&ano===hoje.getFullYear();
+    hdrs.push(`<th class="${isH?'cal-today-hdr':''}">${i}</th>`);
+  }
+  const rows=units.map((unit,ui)=>{
+    const cells=[`<td>${unit}</td>`];
+    const occMap=['cal-occ-a','cal-occ-b','cal-occ-c'];
+    for(let day=1;day<=diasNoMes;day++){
+      const ds=`${ano}-${String(mes+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+      const isH=day===hoje.getDate()&&mes===hoje.getMonth()&&ano===hoje.getFullYear();
+      const occ=arr.find(h=>h.hospedagem===unit&&h.checkin<=ds&&h.checkout>ds&&h.statusHospedagem!=='Encerrado');
+      if(occ){
+        const initials=occ.nome.split(' ').map(w=>w[0]).slice(0,2).join('');
+        cells.push(`<td class="${occMap[ui]||'cal-occ-a'}${isH?' cal-today':''}" title="${occ.nome}" onclick="verH('${occ.id}')" style="cursor:pointer">${initials}</td>`);
+      }else{
+        cells.push(`<td class="cal-vacant${isH?' cal-today':''}">·</td>`);
+      }
+    }
+    return `<tr>${cells.join('')}</tr>`;
+  });
+  document.getElementById('cal-table').innerHTML=`<thead><tr>${hdrs.join('')}</tr></thead><tbody>${rows.join('')}</tbody>`;
+}
+function calMes(d){calOffset+=d;renderCalendario();}
+
+// ── FINANCEIRO ──
+function populateFinFilters(){
+  const ano=document.getElementById('fin-ano');
+  const y=new Date().getFullYear();
+  for(let i=y;i>=y-4;i--){const o=document.createElement('option');o.value=i;o.textContent=i;ano.appendChild(o);}
+  const mes=document.getElementById('fin-mes');
+  ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
+  .forEach((m,i)=>{const o=document.createElement('option');o.value=i+1;o.textContent=m;mes.appendChild(o);});
+}
+function resetFiltroFin(){
+  document.getElementById('fin-mes').value='';
+  document.getElementById('fin-ano').value=new Date().getFullYear();
+  document.getElementById('fin-unit').value='';
+  renderFinanceiro();
+}
+function renderFinanceiro(){
+  let arr=getH();
+  const mes=parseInt(document.getElementById('fin-mes').value)||0;
+  const ano=parseInt(document.getElementById('fin-ano').value)||new Date().getFullYear();
+  const unitF=document.getElementById('fin-unit').value;
+  arr=arr.filter(h=>new Date(h.checkin).getFullYear()===ano);
+  if(mes) arr=arr.filter(h=>new Date(h.checkin).getMonth()+1===mes);
+  if(unitF) arr=arr.filter(h=>h.hospedagem===unitF);
+  const units=getUnits();
+  const uCls=['ua','ub','uc'];
+  const uIco=['🟢','🟡','🔵'];
+  document.getElementById('fin-cards').innerHTML=units.map((u,i)=>{
+    const uh=arr.filter(h=>h.hospedagem===u);
+    const rec=uh.reduce((s,h)=>s+(h.total||0),0);
+    const pg=uh.reduce((s,h)=>s+(h.pago||0),0);
+    const pend=uh.reduce((s,h)=>s+(h.pendente||0),0);
+    return `<div class="fin-card ${uCls[i]||'ua'}">
+      <div class="fin-unit-name">${uIco[i]||'⚪'} ${u}</div>
+      <div class="fin-row"><span class="lbl">Reservas</span><span>${uh.length}</span></div>
+      <div class="fin-row"><span class="lbl">Ativos</span><span>${uh.filter(h=>h.statusHospedagem==='Ativo').length}</span></div>
+      <div class="fin-div"></div>
+      <div class="fin-row"><span class="lbl">Receita Total</span><span class="val-green">R$ ${fmtMoney(rec)}</span></div>
+      <div class="fin-row"><span class="lbl">Recebido</span><span>R$ ${fmtMoney(pg)}</span></div>
+      <div class="fin-row"><span class="lbl">Pendente</span><span class="${pend>0?'val-red':'val-green'}">R$ ${fmtMoney(pend)}</span></div>
+    </div>`;
+  }).join('');
+  // Chart
+  const uData=units.map(u=>arr.filter(h=>h.hospedagem===u).reduce((s,h)=>s+(h.total||0),0));
+  const ctx=document.getElementById('chart-fin-unit').getContext('2d');
+  if(chartFU) chartFU.destroy();
+  chartFU=new Chart(ctx,{type:'bar',data:{labels:units,datasets:[{label:'Receita',data:uData,backgroundColor:['rgba(16,185,129,.7)','rgba(245,158,11,.7)','rgba(59,130,246,.7)'],borderRadius:8}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>'R$ '+v.toLocaleString('pt-BR')},grid:{color:'rgba(0,0,0,.05)'}},x:{grid:{display:false}}}}});
+  // Pendências
+  const pendArr=arr.filter(h=>h.statusFinanceiro!=='Pago');
+  document.getElementById('pend-list').innerHTML=pendArr.length?pendArr.slice(0,8).map(h=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--g100)"><div><strong style="font-size:13px">${h.nome}</strong><br><span style="font-size:11.5px;color:var(--g500)">${h.hospedagem} · ${fd(h.checkin)}</span></div><div style="text-align:right"><div class="val-red">R$ ${fmtMoney(h.pendente||0)}</div>${finBadge(h.statusFinanceiro)}</div></div>`).join(''):'<p style="color:var(--g400);text-align:center;padding:16px;font-size:13px"><i class="fas fa-check-circle" style="color:var(--green)"></i> Sem pendências!</p>';
+  // Extrato
+  const total=arr.reduce((s,h)=>s+(h.total||0),0);
+  const totPg=arr.reduce((s,h)=>s+(h.pago||0),0);
+  const totPend=arr.reduce((s,h)=>s+(h.pendente||0),0);
+  const rows=arr.slice().sort((a,b)=>new Date(b.checkin)-new Date(a.checkin));
+  document.getElementById('tbody-ext').innerHTML=(rows.length?rows.map(h=>`<tr><td>${h.nome}</td><td>${unitBadge(h.hospedagem)}</td><td>${fd(h.checkin)}</td><td>${fd(h.checkout)}</td><td>R$ ${fmtMoney(h.total||0)}</td><td class="val-green">R$ ${fmtMoney(h.pago||0)}</td><td class="${h.pendente>0?'val-red':''}">R$ ${fmtMoney(h.pendente||0)}</td><td>${finBadge(h.statusFinanceiro)}</td></tr>`).join(''):'<tr class="empty-row"><td colspan="8">Nenhum registro.</td></tr>')+
+    `<tr style="background:var(--g50);font-weight:700"><td colspan="4">TOTAL</td><td>R$ ${fmtMoney(total)}</td><td class="val-green">R$ ${fmtMoney(totPg)}</td><td class="${totPend>0?'val-red':''}">R$ ${fmtMoney(totPend)}</td><td></td></tr>`;
+}
+
+// ── BACKUP ──
+function renderBackup(){
+  const arr=getH();
+  const total=arr.length, ativos=arr.filter(x=>x.statusHospedagem==='Ativo').length, enc=arr.filter(x=>x.statusHospedagem==='Encerrado').length;
+  const rec=arr.reduce((s,x)=>s+(x.total||0),0);
+  document.getElementById('bk-stats').innerHTML=`<div class="stat-pills"><div class="stat-pill"><div class="stat-pill-val">${total}</div><div class="stat-pill-lbl">Hóspedes</div></div><div class="stat-pill"><div class="stat-pill-val">${ativos}</div><div class="stat-pill-lbl">Ativos</div></div><div class="stat-pill"><div class="stat-pill-val">${enc}</div><div class="stat-pill-lbl">Encerrados</div></div><div class="stat-pill"><div class="stat-pill-val">R$ ${(rec/1000).toFixed(1)}k</div><div class="stat-pill-lbl">Receita Total</div></div></div>`;
+  document.getElementById('db-summary').innerHTML=`<div class="detail-grid"><div class="di"><div class="di-label">Total de Registros</div><div class="di-value">${total}</div></div><div class="di"><div class="di-label">Armazenamento</div><div class="di-value">${(JSON.stringify(arr).length/1024).toFixed(2)} KB</div></div><div class="di"><div class="di-label">Última Reserva</div><div class="di-value">${arr.length?new Date(arr.slice(-1)[0].registro||Date.now()).toLocaleString('pt-BR'):'—'}</div></div><div class="di"><div class="di-label">Receita Total</div><div class="di-value">R$ ${fmtMoney(rec)}</div></div></div>`;
+}
+function exportJSON(){
+  const b=new Blob([JSON.stringify(getH(),null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+  a.download=`melos_backup_${new Date().toISOString().slice(0,10)}.json`; a.click(); flash('JSON exportado!');
+}
+function exportCSV(){
+  const arr=getH(); if(!arr.length){flash('Nenhum dado.','warn');return;}
+  const cols=['nome','cpf','telefone','email','hospedagem','origem','codigoReserva','checkin','checkout','diaria','pago','total','pendente','statusFinanceiro','statusHospedagem','cidade','estado','observacoes'];
+  const csv=[cols.join(';'),...arr.map(x=>cols.map(c=>`"${(x[c]||'').toString().replace(/"/g,'""')}"`).join(';'))].join('\n');
+  const b=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+  a.download=`melos_hospedes_${new Date().toISOString().slice(0,10)}.csv`; a.click(); flash('CSV exportado!');
+}
+function doImport(substituir){
+  const file=document.getElementById('import-file').files[0];
+  if(!file){flash('Selecione um arquivo JSON.','warn');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      let data=JSON.parse(e.target.result);
+      if(!Array.isArray(data)) throw new Error('Formato inválido');
+      data=data.map(h=>({
+        id:h.id||uid(), nome:h.nome||h.Nome||'',
+        cpf:h.cpf||h.CPF||'', telefone:h.telefone||h.Telefone||'',
+        email:h.email||h['E-mail']||h.Email||'',
+        cep:h.cep||h.CEP||'', logradouro:h.logradouro||h.Logradouro||'',
+        numero:h.numero||h['Número']||h.Numero||'',
+        complemento:h.complemento||h.Complemento||'',
+        cidade:h.cidade||h.Cidade||'', estado:h.estado||h.Estado||'',
+        hospedagem:h.hospedagem||h.Hospedagem||'',
+        origem:h.origem||h.Origem||'',
+        codigoReserva:h.codigoReserva||h.CodigoReserva||h['CódigoReserva']||'',
+        checkin:normDate(h.checkin||h['Check-in']||h.Check_in||''),
+        checkout:normDate(h.checkout||h['Check-out']||h.Check_out||''),
+        registro:h.registro||h.Registro||new Date().toISOString(),
+        diaria:parseFloat(h.diaria||h.ValorDiaria||0),
+        pago:parseFloat(h.pago||h.ValorPago||0),
+        total:parseFloat(h.total||h.Total||0),
+        pendente:parseFloat(h.pendente||h.Pendente||0),
+        statusFinanceiro:h.statusFinanceiro||h.StatusFinanceiro||'Pendente',
+        statusHospedagem:(h.statusHospedagem||h.StatusHospedagem||'Ativo').replace(/[🟢🔴⚫️ ]/g,'').trim(),
+        observacoes:h.observacoes||h.Observacoes||''
+      }));
+      if(substituir){ setH(data); flash(`${data.length} registros importados.`,'info'); }
+      else{
+        const ex=getH(); const exIds=new Set(ex.map(h=>h.id));
+        const novos=data.filter(h=>!exIds.has(h.id));
+        setH([...ex,...novos]); flash(`${novos.length} novos registros importados.`,'info');
+      }
+      renderBackup();
+    }catch(err){flash('Erro ao importar: '+err.message,'err');}
+  };
+  reader.readAsText(file);
+}
+function confirmarLimpar(){
+  confirm2('Apagar Todos os Dados','Isso apagará PERMANENTEMENTE todos os hóspedes. Ação irreversível.',()=>{setH([]);renderBackup();flash('Dados apagados.','warn');},'Apagar Tudo');
+}
+
+// ── CONFIG ──
+function renderConfig(){
+  const units=getUnits();
+  document.getElementById('units-list').innerHTML=units.map((u,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--g50);border-radius:7px;margin-bottom:7px"><span style="font-weight:500">${u}</span><button class="btn btn-danger btn-xs" onclick="remUnit(${i})" ${units.length<=1?'disabled':''}><i class="fas fa-times"></i></button></div>`).join('');
+  populateSelectUnits();
+}
+function addUnit(){
+  const name=document.getElementById('new-unit').value.trim();
+  if(!name){flash('Informe o nome.','warn');return;}
+  const units=getUnits();
+  if(units.includes(name)){flash('Já existe.','warn');return;}
+  units.push(name); setUnits(units);
+  document.getElementById('new-unit').value=''; renderConfig(); flash(`"${name}" adicionada!`);
+}
+function remUnit(i){
+  const units=getUnits();
+  confirm2('Remover Unidade',`Remover "${units[i]}"?`,()=>{units.splice(i,1);setUnits(units);renderConfig();flash('Unidade removida.','warn');},'Remover');
+}
+function salvarCreds(){
+  const u=document.getElementById('cfg-user').value.trim();
+  const p=document.getElementById('cfg-pass').value;
+  const p2=document.getElementById('cfg-pass2').value;
+  if(!u||!p){flash('Preencha usuário e senha.','err');return;}
+  if(p!==p2){flash('Senhas não coincidem.','err');return;}
+  localStorage.setItem(CK,JSON.stringify({u,p})); flash('Credenciais salvas!');
+  document.getElementById('cfg-pass').value=''; document.getElementById('cfg-pass2').value='';
+}
+function populateSelectUnits(){
+  const units=getUnits();
+  ['c-hosp','f-hosp','fin-unit'].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    const cur=el.value; const isFilter=id!=='c-hosp';
+    el.innerHTML=(isFilter?'<option value="">Todas</option>':'')+units.map(u=>`<option>${u}</option>`).join('');
+    if(cur&&units.includes(cur)) el.value=cur;
+  });
+}
+function populateUnitSelect(id, sel){
+  const el=document.getElementById(id); if(!el) return;
+  el.innerHTML=getUnits().map(u=>`<option${u===sel?' selected':''}>${u}</option>`).join('');
+}
+
+// ── HELPERS ──
+function fd(s){if(!s)return '—';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`;}
+function fmtMoney(n){return Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function esc(s){return(s||'').replace(/'/g,"\\'");}
+function normDate(s){
+  if(!s) return '';
+  if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,10);
+  const m=s.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+  if(m) return `${m[3]}-${m[2]}-${m[1]}`;
+  return s;
+}
+function unitBadge(u){const m={Beijupirá:'badge-green',Dubourcq:'badge-orange',Portobelo:'badge-blue'};return`<span class="badge ${m[u]||'badge-gray'}">${u||'—'}</span>`;}
+function finBadge(s){const m={Pago:'badge-green',Parcial:'badge-orange',Pendente:'badge-red'};return`<span class="badge ${m[s]||'badge-gray'}">${s||'—'}</span>`;}
+function hospBadge(s){const m={Ativo:'badge-green',Reserva:'badge-blue',Encerrado:'badge-gray'};return`<span class="badge ${m[s]||'badge-gray'}">${s||'—'}</span>`;}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.modal-bg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('open');}));
+  document.getElementById('l-user').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('l-pass').focus();});
+  limparCadastro();
+});
+</script>
+</body>
+</html>

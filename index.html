@@ -182,6 +182,15 @@ tbody tr:hover td{background:var(--g50)}
 .cal-occ-c{background:#dbeafe;color:#1e3a8a;font-weight:700;font-size:11px}
 .cal-today{outline:2px solid var(--blue);outline-offset:-2px}
 .cal-today-hdr{background:#1d4ed8!important}
+.cal-fora-periodo{opacity:.3}
+.cal-fora-periodo-cell{background:#f8fafc;color:var(--g200);font-size:10px}
+.cal-cell-name{font-size:8px;font-weight:400;line-height:1;margin-top:1px;max-width:32px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.85}
+.cal-periodo-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.cal-periodo-btn{padding:5px 16px;border-radius:20px;border:1.5px solid var(--g200);background:white;font-size:12.5px;font-weight:500;color:var(--g600);cursor:pointer;transition:all .15s}
+.cal-periodo-btn:hover{border-color:var(--blue);color:var(--blue)}
+.cal-periodo-btn.active{background:var(--navy);color:white;border-color:var(--navy)}
+.cal-mes-bloco{margin-bottom:22px}
+.cal-mes-header-lbl{font-size:13px;font-weight:700;color:var(--navy);padding:8px 0 8px;text-transform:capitalize;display:flex;align-items:center;gap:8px}
 .cal-legend{display:flex;gap:20px;flex-wrap:wrap;margin-top:14px}
 .cal-legend-item{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--g600)}
 .cal-legend-dot{width:14px;height:14px;border-radius:4px}
@@ -384,7 +393,7 @@ tbody tr:hover td{background:var(--g50)}
           <div class="sec-title">Dados da Reserva</div>
           <div class="form-grid mb16">
             <div class="fg"><label class="fl">Unidade <span class="req">*</span></label><select class="fs" id="c-hosp"><option value="Beijupirá">Beijupirá</option><option value="Dubourcq">Dubourcq</option><option value="Portobelo">Portobelo</option></select></div>
-            <div class="fg"><label class="fl">Origem da Reserva</label><select class="fs" id="c-origem"><option>WhatsApp</option><option>Indicação</option><option>Site</option><option>Booking</option><option>Airbnb</option><option>Outros</option></select></div>
+            <div class="fg"><label class="fl">Origem da Reserva</label><select class="fs" id="c-origem"><option>WhatsApp</option><option>Indicação</option><option>Site</option><option>Booking</option><option>Airbnb</option><option>Venda Direta</option></select></div>
             <div class="fg"><label class="fl">Código da Reserva</label><input class="fi" id="c-cod" type="text" placeholder="Ex: BKG-00123"></div>
             <div class="fg"><label class="fl">Status da Hospedagem</label><select class="fs" id="c-status-hosp"><option value="Reserva">Reserva (ainda não chegou)</option><option value="Ativo">Ativo (check-in feito)</option><option value="Encerrado">Encerrado</option></select></div>
             <div class="fg"><label class="fl">Check-in <span class="req">*</span></label><input class="fi" id="c-checkin" type="date" onchange="calcTotal()"></div>
@@ -452,19 +461,30 @@ tbody tr:hover td{background:var(--g50)}
       <div class="card">
         <div class="card-header"><div class="card-title"><i class="fas fa-calendar-alt"></i> Calendário de Ocupação</div></div>
         <div class="card-body">
-          <div class="cal-nav">
-            <button class="btn btn-ghost btn-sm" onclick="calMes(-1)"><i class="fas fa-chevron-left"></i></button>
-            <div class="cal-title" id="cal-title"></div>
-            <button class="btn btn-ghost btn-sm" onclick="calMes(1)"><i class="fas fa-chevron-right"></i></button>
-            <button class="btn btn-ghost btn-sm" onclick="calOffset=0;renderCalendario()">Hoje</button>
+          <!-- Filtros de período -->
+          <div class="cal-periodo-bar">
+            <span style="font-size:12px;color:var(--g500);font-weight:600">Período:</span>
+            <button class="cal-periodo-btn active" data-dias="0" onclick="setCalPeriodo(0)">Mês Atual</button>
+            <button class="cal-periodo-btn" data-dias="30" onclick="setCalPeriodo(30)">30 dias</button>
+            <button class="cal-periodo-btn" data-dias="60" onclick="setCalPeriodo(60)">60 dias</button>
+            <button class="cal-periodo-btn" data-dias="90" onclick="setCalPeriodo(90)">90 dias</button>
           </div>
-          <div class="cal-wrap"><table class="cal-table" id="cal-table"></table></div>
+          <div class="cal-nav">
+            <span id="cal-nav-arrows" style="display:flex;align-items:center;gap:8px">
+              <button class="btn btn-ghost btn-sm" onclick="calMes(-1)"><i class="fas fa-chevron-left"></i></button>
+              <button class="btn btn-ghost btn-sm" onclick="calMes(1)"><i class="fas fa-chevron-right"></i></button>
+              <button class="btn btn-ghost btn-sm" onclick="calOffset=0;renderCalendario()">Hoje</button>
+            </span>
+            <div class="cal-title" id="cal-title" style="font-weight:700;color:var(--navy)"></div>
+          </div>
+          <div class="cal-wrap" id="cal-wrap"><table class="cal-table" id="cal-table"></table></div>
           <div class="cal-legend">
             <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#d1fae5;border:1px solid #86efac"></div>Beijupirá</div>
             <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#fef9c3;border:1px solid #fde047"></div>Dubourcq</div>
             <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#dbeafe;border:1px solid #93c5fd"></div>Portobelo</div>
             <div class="cal-legend-item"><div class="cal-legend-dot" style="background:white;border:1px solid var(--g300)"></div>Disponível</div>
           </div>
+          <div id="cal-hospedes-info"></div>
         </div>
       </div>
     </div>
@@ -701,7 +721,7 @@ tbody tr:hover td{background:var(--g50)}
     <div class="sep"></div>
     <div class="form-grid mb16">
       <div class="fg"><label class="fl">Unidade</label><select class="fs" id="me-hosp"></select></div>
-      <div class="fg"><label class="fl">Origem</label><select class="fs" id="me-origem"><option>WhatsApp</option><option>Indicação</option><option>Site</option><option>Booking</option><option>Airbnb</option><option>Outros</option></select></div>
+      <div class="fg"><label class="fl">Origem</label><select class="fs" id="me-origem"><option>WhatsApp</option><option>Indicação</option><option>Site</option><option>Booking</option><option>Airbnb</option><option>Venda Direta</option></select></div>
       <div class="fg"><label class="fl">Código Reserva</label><input class="fi" id="me-cod" type="text"></div>
       <div class="fg"><label class="fl">Status Hospedagem</label><select class="fs" id="me-sh"><option value="Reserva">Reserva</option><option value="Ativo">Ativo</option><option value="Encerrado">Encerrado</option></select></div>
       <div class="fg"><label class="fl">Check-in</label><input class="fi" id="me-ci" type="date" onchange="calcEditTotal()"></div>
@@ -1085,7 +1105,7 @@ function abrirEdicao(id){
   document.getElementById('me-tel').value=h.telefone||'';
   document.getElementById('me-email').value=h.email||'';
   populateUnitSelect('me-hosp', h.hospedagem);
-  document.getElementById('me-origem').value=h.origem||'Outros';
+  document.getElementById('me-origem').value=h.origem||'Venda Direta';
   document.getElementById('me-cod').value=h.codigoReserva||'';
   document.getElementById('me-sh').value=h.statusHospedagem||'Ativo';
   document.getElementById('me-ci').value=h.checkin||'';
@@ -1188,35 +1208,123 @@ function renderDashboard(){
 }
 
 // ── CALENDÁRIO ──
-function renderCalendario(){
-  const hoje=new Date();
-  const d=new Date(hoje.getFullYear(),hoje.getMonth()+calOffset,1);
-  const ano=d.getFullYear(), mes=d.getMonth();
-  document.getElementById('cal-title').textContent=d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
+let calPeriodo=0;
+
+function setCalPeriodo(dias){
+  calPeriodo=dias;
+  calOffset=0;
+  renderCalendario();
+}
+
+function _calCellHtml(occ, occClass, isH){
+  if(!occ) return `<td class="cal-vacant${isH?' cal-today':''}">·</td>`;
+  const initials=occ.nome.split(' ').map(w=>w[0]).slice(0,2).join('');
+  const firstName=occ.nome.split(' ')[0].slice(0,8);
+  return `<td class="${occClass}${isH?' cal-today':''}" title="${occ.nome}" onclick="verH('${occ.id}')" style="cursor:pointer;vertical-align:middle;line-height:1.1">
+    <div style="font-weight:700">${initials}</div>
+    <div class="cal-cell-name">${firstName}</div>
+  </td>`;
+}
+
+function _buildMesGrid(ano, mes, arr, units, hoje, periodoIni, periodoFim){
   const diasNoMes=new Date(ano,mes+1,0).getDate();
-  const arr=getH(); const units=getUnits();
+  const occMap=['cal-occ-a','cal-occ-b','cal-occ-c'];
   const hdrs=['<th>Unidade</th>'];
   for(let i=1;i<=diasNoMes;i++){
     const isH=i===hoje.getDate()&&mes===hoje.getMonth()&&ano===hoje.getFullYear();
-    hdrs.push(`<th class="${isH?'cal-today-hdr':''}">${i}</th>`);
+    let fora=false;
+    if(periodoIni&&periodoFim){const dt=new Date(ano,mes,i);fora=dt<periodoIni||dt>periodoFim;}
+    hdrs.push(`<th class="${isH?'cal-today-hdr':''}${fora?' cal-fora-periodo':''}">${i}</th>`);
   }
   const rows=units.map((unit,ui)=>{
     const cells=[`<td>${unit}</td>`];
-    const occMap=['cal-occ-a','cal-occ-b','cal-occ-c'];
     for(let day=1;day<=diasNoMes;day++){
       const ds=`${ano}-${String(mes+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
       const isH=day===hoje.getDate()&&mes===hoje.getMonth()&&ano===hoje.getFullYear();
+      let fora=false;
+      if(periodoIni&&periodoFim){const dt=new Date(ano,mes,day);fora=dt<periodoIni||dt>periodoFim;}
+      if(fora){cells.push(`<td class="cal-fora-periodo-cell${isH?' cal-today':''}">·</td>`);continue;}
       const occ=arr.find(h=>h.hospedagem===unit&&h.checkin<=ds&&h.checkout>ds&&h.statusHospedagem!=='Encerrado');
-      if(occ){
-        const initials=occ.nome.split(' ').map(w=>w[0]).slice(0,2).join('');
-        cells.push(`<td class="${occMap[ui]||'cal-occ-a'}${isH?' cal-today':''}" title="${occ.nome}" onclick="verH('${occ.id}')" style="cursor:pointer">${initials}</td>`);
-      }else{
-        cells.push(`<td class="cal-vacant${isH?' cal-today':''}">·</td>`);
-      }
+      cells.push(_calCellHtml(occ, occMap[ui]||'cal-occ-a', isH));
     }
     return `<tr>${cells.join('')}</tr>`;
   });
-  document.getElementById('cal-table').innerHTML=`<thead><tr>${hdrs.join('')}</tr></thead><tbody>${rows.join('')}</tbody>`;
+  return `<thead><tr>${hdrs.join('')}</tr></thead><tbody>${rows.join('')}</tbody>`;
+}
+
+function _buildHospedesInfoHtml(hospedes, labelPeriodo){
+  const origemIcon={WhatsApp:'<i class="fab fa-whatsapp" style="color:#25d366"></i>',Booking:'<i class="fas fa-globe" style="color:#003580"></i>',Airbnb:'<i class="fab fa-airbnb" style="color:#ff5a5f"></i>',Indicação:'<i class="fas fa-user-friends" style="color:#8b5cf6"></i>',Site:'<i class="fas fa-laptop" style="color:#3b82f6"></i>','Venda Direta':'<i class="fas fa-handshake" style="color:#f59e0b"></i>'};
+  if(hospedes.length===0) return `<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--g100);text-align:center;font-size:13px;color:var(--g400)"><i class="fas fa-moon" style="margin-right:6px"></i>Nenhuma reserva ativa ${labelPeriodo}</div>`;
+  const linhas=hospedes.map(h=>{
+    const icon=origemIcon[h.origem]||'<i class="fas fa-question-circle" style="color:#94a3b8"></i>';
+    return `<tr>
+      <td style="padding:7px 12px">${unitBadge(h.hospedagem)}</td>
+      <td style="padding:7px 12px;font-weight:600;color:var(--navy)">${esc2(h.nome)}</td>
+      <td style="padding:7px 12px;font-size:12.5px;color:var(--g500)">${fd(h.checkin)} → ${fd(h.checkout)}</td>
+      <td style="padding:7px 12px">${icon} <span style="font-size:12.5px;color:var(--g600);margin-left:4px">${h.origem||'—'}</span></td>
+    </tr>`;
+  }).join('');
+  return `<div style="margin-top:18px;border-top:1px solid var(--g100);padding-top:14px">
+    <div style="font-size:12px;font-weight:600;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Hóspedes no período</div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead><tr style="background:var(--g50)">
+        <th style="padding:7px 12px;text-align:left;font-size:12px;color:var(--g500);font-weight:600">Unidade</th>
+        <th style="padding:7px 12px;text-align:left;font-size:12px;color:var(--g500);font-weight:600">Hóspede</th>
+        <th style="padding:7px 12px;text-align:left;font-size:12px;color:var(--g500);font-weight:600">Período</th>
+        <th style="padding:7px 12px;text-align:left;font-size:12px;color:var(--g500);font-weight:600">Origem da Reserva</th>
+      </tr></thead>
+      <tbody>${linhas}</tbody>
+    </table>
+  </div>`;
+}
+
+function renderCalendario(){
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  const arr=getH(); const units=getUnits();
+  const navArrows=document.getElementById('cal-nav-arrows');
+  const calWrap=document.getElementById('cal-wrap');
+  const infoEl=document.getElementById('cal-hospedes-info');
+
+  // Atualizar estado dos botões de período
+  document.querySelectorAll('.cal-periodo-btn').forEach(b=>{
+    b.classList.toggle('active', parseInt(b.dataset.dias)===calPeriodo);
+  });
+
+  if(calPeriodo===0){
+    // ── Modo Mês ──
+    if(navArrows) navArrows.style.display='flex';
+    const d=new Date(hoje.getFullYear(),hoje.getMonth()+calOffset,1);
+    const ano=d.getFullYear(), mes=d.getMonth();
+    document.getElementById('cal-title').textContent=d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
+    const diasNoMes=new Date(ano,mes+1,0).getDate();
+    calWrap.innerHTML=`<table class="cal-table" id="cal-table">${_buildMesGrid(ano,mes,arr,units,hoje)}</table>`;
+    const inicioMes=`${ano}-${String(mes+1).padStart(2,'0')}-01`;
+    const fimMes=`${ano}-${String(mes+1).padStart(2,'0')}-${String(diasNoMes).padStart(2,'0')}`;
+    const hospedes=arr.filter(h=>h.statusHospedagem!=='Encerrado'&&h.checkin<=fimMes&&h.checkout>inicioMes);
+    infoEl.innerHTML=_buildHospedesInfoHtml(hospedes,'neste mês');
+  } else {
+    // ── Modo Período (30/60/90 dias) ──
+    if(navArrows) navArrows.style.display='none';
+    const fim=new Date(hoje); fim.setDate(fim.getDate()+calPeriodo-1);
+    document.getElementById('cal-title').textContent=`Próximos ${calPeriodo} dias — ${hoje.toLocaleDateString('pt-BR')} até ${fim.toLocaleDateString('pt-BR')}`;
+    // Gerar um bloco por mês dentro do período
+    let html='';
+    let cur=new Date(hoje.getFullYear(),hoje.getMonth(),1);
+    while(cur<=fim){
+      const ano=cur.getFullYear(), mes=cur.getMonth();
+      const mesNome=cur.toLocaleDateString('pt-BR',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
+      html+=`<div class="cal-mes-bloco">
+        <div class="cal-mes-header-lbl"><i class="fas fa-calendar" style="color:var(--blue)"></i>${mesNome}</div>
+        <div class="cal-wrap"><table class="cal-table">${_buildMesGrid(ano,mes,arr,units,hoje,hoje,fim)}</table></div>
+      </div>`;
+      cur.setMonth(cur.getMonth()+1);
+    }
+    calWrap.innerHTML=html;
+    const inicioStr=hoje.toISOString().split('T')[0];
+    const fimStr=fim.toISOString().split('T')[0];
+    const hospedes=arr.filter(h=>h.statusHospedagem!=='Encerrado'&&h.checkin<=fimStr&&h.checkout>inicioStr);
+    infoEl.innerHTML=_buildHospedesInfoHtml(hospedes,`nos próximos ${calPeriodo} dias`);
+  }
 }
 function calMes(d){calOffset+=d;renderCalendario();}
 
